@@ -1,384 +1,569 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="description"
-        content="PolyFly">
-  <meta name="keywords" content="Nerfies, D-NeRF, NeRF">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PolyFly: Polytopic Optimal Planning for Collision-Free Cable-Suspended Aerial Payload Transportation </title>
+  <meta name="description" content="Prompt2Fly: An LLM and Vision-Language Behavior Tree Framework for Autonomous Aerial Transportation">
+  <title>Prompt2Fly: An LLM and Vision-Language Behavior Tree Framework for Autonomous Aerial Transportation</title>
+  <link rel="icon" href="./static/images/favicon.svg">
 
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-    function gtag() {
-      dataLayer.push(arguments);
+  <!-- Editorial theme, ported from mrunaljsarvaiya.github.io/_sass/_editorial.scss -->
+  <style>
+    :root {
+      --ed-paper: #F7F6F2;
+      --ed-ink: #202424;
+      --ed-sub: #696C68;
+      --ed-rule: #D5D7CE;
+      --ed-electric: #244A73;
+      --ed-accent: #79AD52;
+
+      --ed-sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+      --ed-display: "Inter Tight", "Inter", "Helvetica Neue", Arial, sans-serif;
+      --ed-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     }
 
-    gtag('js', new Date());
+    *, *::before, *::after { box-sizing: border-box; }
 
-    gtag('config', 'G-PYVRSFMDRL');
-  </script>
+    html { -webkit-text-size-adjust: 100%; }
 
-  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
-        rel="stylesheet">
+    body {
+      margin: 0;
+      font-family: var(--ed-sans);
+      font-size: 16px;
+      line-height: 1.65;
+      background: var(--ed-paper);
+      color: var(--ed-ink);
+      -webkit-font-smoothing: antialiased;
+    }
 
-  <link rel="stylesheet" href="./static/css/bulma.min.css">
-  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
-  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
-  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
-  <link rel="stylesheet" href="./static/css/index.css">
-  <link rel="icon" href="./static/images/rpg_icon.ico">
+    h1, h2, h3 {
+      font-family: var(--ed-display);
+      font-weight: 700;
+      color: var(--ed-ink);
+    }
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script defer src="./static/js/fontawesome.all.min.js"></script>
-  <script src="./static/js/bulma-carousel.min.js"></script>
-  <script src="./static/js/bulma-slider.min.js"></script>
-  <script src="./static/js/index.js"></script>
+    a {
+      color: var(--ed-electric);
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    a:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--ed-electric);
+      outline-offset: 4px;
+    }
+
+    ::selection { background: rgba(36, 74, 115, 0.15); }
+
+    strong { font-weight: 600; }
+
+    /* One centered reading column: text and images share the same edges. */
+    .ed-page {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 0 16px 72px;
+    }
+
+    /* Small uppercase monospace label: section numbers, venues, captions. */
+    .ed-label {
+      font-family: var(--ed-mono);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 1.4px;
+      line-height: 1.6;
+      text-transform: uppercase;
+      color: var(--ed-sub);
+    }
+
+    .ed-accent-rule {
+      display: block;
+      width: 32px;
+      height: 3px;
+      background: var(--ed-accent);
+    }
+
+    /* Header */
+    .post-header {
+      margin: 64px 0 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--ed-rule);
+    }
+
+    .post-header .ed-label { margin-bottom: 14px; }
+
+    .post-title {
+      font-size: clamp(36px, 6vw, 56px);
+      letter-spacing: -0.04em;
+      line-height: 0.98;
+      margin: 0;
+    }
+
+    .post-subtitle {
+      font-size: clamp(20px, 2.8vw, 26px);
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      margin: 14px 0 20px;
+      max-width: 680px;
+    }
+
+    .post-authors {
+      margin: 20px 0 4px;
+      font-size: 15px;
+      color: var(--ed-ink);
+    }
+
+    .ed-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 24px;
+      margin-top: 16px;
+    }
+
+    .ed-links span { color: var(--ed-sub); }
+
+    /* Sections: "01 / ABSTRACT" over a hairline rule */
+    .ed-section { margin-top: 72px; }
+
+    .ed-section-head {
+      padding-bottom: 12px;
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--ed-rule);
+    }
+
+    .ed-prose p { margin: 0 0 16px; }
+
+    /* Contributions */
+    .ed-contributions {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .ed-contributions li {
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr);
+      padding: 20px 0;
+      border-top: 1px solid var(--ed-rule);
+    }
+
+    .ed-contributions li:first-child { border-top: 0; padding-top: 0; }
+
+    .ed-contributions h3 {
+      font-size: 18px;
+      letter-spacing: -0.015em;
+      line-height: 1.25;
+      margin: 0 0 6px;
+    }
+
+    .ed-contributions p { margin: 0; color: var(--ed-sub); }
+
+    /* Figures */
+    figure { margin: 0 0 48px; }
+    figure:last-child { margin-bottom: 0; }
+
+    figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #fff;
+    }
+
+    figcaption {
+      margin-top: 14px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--ed-sub);
+    }
+
+    figcaption .ed-label {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    figcaption strong { color: var(--ed-ink); }
+
+    /* Footer */
+    .ed-footer {
+      margin-top: 96px;
+      padding-top: 16px;
+      border-top: 1px solid var(--ed-rule);
+    }
+
+    .ed-footer a { font-weight: 400; }
+
+    @media (max-width: 576px) {
+      .post-header { margin-top: 40px; }
+      .ed-section { margin-top: 56px; }
+      .ed-contributions li { grid-template-columns: 32px minmax(0, 1fr); }
+    }
+  </style>
 </head>
 <body>
 
-<style>
-  .gray-background {
-    background-color: #f0f0f0; 
+<main class="ed-page">
+
+  <header class="post-header">
+    <div class="ed-label">ICRA 2027 · Under review</div>
+    <h1 class="post-title">Prompt2Fly</h1>
+    <h2 class="post-subtitle">An LLM and Vision-Language Behavior Tree Framework for Autonomous Aerial Transportation</h2>
+    <span class="ed-accent-rule" aria-hidden="true"></span>
+
+    <!-- TODO: author list and affiliations -->
+    <p class="post-authors">Authors — TBA</p>
+
+    <!-- TODO: replace with <a> links once released (paper, video, code) -->
+    <div class="ed-links ed-label">
+      <span>Paper — coming soon</span>
+      <span>Video — coming soon</span>
+      <span>Code — coming soon</span>
+    </div>
+  </header>
+
+  <!-- Animated payload-pickup hero, styled after the robot-journey hero on mrunaljsarvaiya.github.io -->
+  <section id="p2f-hero" aria-label="Animated quadrotor with a cable-suspended magnet picking up four payloads">
+    <div class="p2f-main">
+      <div class="p2f-model"><canvas role="img" aria-label="A quadrotor with a cable-suspended magnet flies over four payloads in turn, a tomato sauce can, a quadrotor, a yellow cube and a red cube, lowering its magnet onto each one and lifting it."></canvas></div>
+      <div class="p2f-caption">
+        <div class="p2f-index">01 / Tomato sauce can</div>
+        <h2 aria-live="polite">“Pick up the tomato sauce can.”</h2>
+        <p class="p2f-behavior"><span>Behavior</span> <b>Front VLM Action</b></p>
+        <span class="p2f-rule"></span>
+      </div>
+    </div>
+    <nav class="p2f-timeline" aria-label="Jump to a payload">
+      <button type="button" data-obj="0" aria-pressed="true"><span class="p2f-step">01</span><span class="p2f-name">Tomato sauce can</span><span class="p2f-track"><i></i></span></button>
+      <button type="button" data-obj="1" aria-pressed="false"><span class="p2f-step">02</span><span class="p2f-name">Quadrotor</span><span class="p2f-track"><i></i></span></button>
+      <button type="button" data-obj="2" aria-pressed="false"><span class="p2f-step">03</span><span class="p2f-name">Yellow cube</span><span class="p2f-track"><i></i></span></button>
+      <button type="button" data-obj="3" aria-pressed="false"><span class="p2f-step">04</span><span class="p2f-name">Red cube</span><span class="p2f-track"><i></i></span></button>
+    </nav>
+    <footer class="p2f-footer"><span>Language / Behavior tree / Flight</span><button class="p2f-play" type="button" aria-label="Pause animation">Pause <span aria-hidden="true">Ⅱ</span></button></footer>
+  </section>
+  <style>
+    #p2f-hero{--stage:#db7774;margin-top:8px;font-family:var(--ed-display)}
+    #p2f-hero .p2f-main{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(170px,1fr);gap:24px;align-items:center}
+    #p2f-hero .p2f-model{height:320px;position:relative;min-width:0}
+    #p2f-hero canvas{display:block;width:100%;height:100%}
+    #p2f-hero .p2f-index{font:12px var(--ed-mono);letter-spacing:1.4px;text-transform:uppercase;color:var(--ed-sub);margin-bottom:14px}
+    #p2f-hero h2{font-size:clamp(22px,3vw,28px);line-height:1.12;letter-spacing:-.6px;margin:0;font-weight:700}
+    #p2f-hero .p2f-behavior{margin:16px 0 18px;font:11px var(--ed-mono);letter-spacing:1.2px;text-transform:uppercase;color:var(--ed-sub)}
+    #p2f-hero .p2f-behavior b{display:block;margin-top:4px;font-weight:500;color:var(--ed-ink)}
+    #p2f-hero .p2f-rule{width:32px;height:3px;background:var(--stage);display:block}
+    #p2f-hero .p2f-timeline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-top:10px}
+    #p2f-hero button{font-family:inherit;color:inherit;cursor:pointer}
+    #p2f-hero .p2f-timeline button{display:flex;flex-direction:column;align-items:stretch;border:0;background:transparent;text-align:left;padding:9px 0 0;min-width:0}
+    #p2f-hero .p2f-step{font:12px var(--ed-mono);color:var(--ed-sub);display:block;margin-bottom:7px}
+    #p2f-hero .p2f-name{font-size:13.2px;line-height:1.4;font-weight:500;display:block;opacity:.58}
+    #p2f-hero .p2f-timeline button[aria-pressed=true] .p2f-name{opacity:1;font-weight:700}
+    #p2f-hero .p2f-track{position:relative;display:block;background:var(--ed-rule);height:2px;margin-top:10px;width:100%}
+    #p2f-hero .p2f-track i{position:absolute;left:0;top:0;height:2px;width:0;background:var(--stage)}
+    #p2f-hero .p2f-footer{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:20px;font:10.8px var(--ed-mono);letter-spacing:1px;text-transform:uppercase;color:var(--ed-sub)}
+    #p2f-hero .p2f-play{background:transparent;border:0;font:13.2px var(--ed-mono);padding:8px 0 8px 14px;white-space:nowrap;min-height:36px;color:var(--ed-sub)}
+    #p2f-hero .p2f-play:hover{color:var(--ed-electric)}
+    #p2f-hero .p2f-play span{padding-left:6px}
+    #p2f-hero button:focus-visible{outline:2px solid var(--ed-electric);outline-offset:5px}
+    @media(max-width:576px){#p2f-hero .p2f-main{grid-template-columns:1fr;gap:4px}#p2f-hero .p2f-model{height:250px}#p2f-hero .p2f-behavior{margin:10px 0 12px}#p2f-hero .p2f-timeline{gap:8px}#p2f-hero .p2f-name{font-size:12px;min-height:34px}#p2f-hero .p2f-footer{font-size:9.6px;letter-spacing:.6px}}
+  </style>
+  <script>
+  (()=>{
+  const root=document.getElementById('p2f-hero');
+  if(!root)return;
+  const canvas=root.querySelector('canvas'),g=canvas.getContext('2d');
+  const buttons=[...root.querySelectorAll('[data-obj]')],play=root.querySelector('.p2f-play');
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)');
+
+  const rgb=h=>h.match(/\w\w/g).map(v=>parseInt(v,16));
+  const TAU=Math.PI*2,add=(a,b)=>a.map((x,i)=>x+b[i]),sub=(a,b)=>a.map((x,i)=>x-b[i]),mul=(a,s)=>a.map(x=>x*s),dot=(a,b)=>a.reduce((s,x,i)=>s+x*b[i],0),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],unit=a=>mul(a,1/(Math.hypot(...a)||1));
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t,ease=t=>t*t*t*(t*(t*6-15)+10);
+  const dark=rgb('303839'),cream=rgb('e6dcc2'),coral=rgb('db7774'),gold=rgb('e7b74b'),blue=rgb('659cd6'),brick=rgb('c4554f'),metal=rgb('a9afb0'),silver=rgb('c3c9cb'),white=rgb('dde5e8');
+
+  // Same faceted-prism primitive as the robot-journey hero: 12 samples per ring, optional square section.
+  function part(a,b,r1,r2,col,box=false,opacity=1){
+   const axis=unit(sub(b,a)),u=unit(cross(axis,Math.abs(axis[2])<.9?[0,0,1]:[0,1,0])),v=cross(axis,u),pts=[];
+   for(const p of [a,b])for(let j=0;j<12;j++){
+    const t=j/12*TAU;let x=Math.cos(t),z=Math.sin(t);
+    if(box){const m=Math.max(Math.abs(x),Math.abs(z));x/=m;z/=m;}
+    pts.push(add(p,add(mul(u,x*r1),mul(v,z*r2))));
+   }
+   return{pts,color:col,opacity};
   }
-</style>
-  
+  const rod=(a,b,r,c)=>part(a,b,r,r,c);
+  const slab=(y0,y1,hw,hd,c,o)=>part([0,y0,0],[0,y1,0],hw,hd,c,true,o);
+  const disc=(p,h,r,c,o=1)=>part(p,add(p,[0,h,0]),r,r,c,false,o);
+  const beam=(a,b,w,c)=>part(a,b,w/2,w/2,c,true);
+  // Rigid transform: rotate about z by phi around pivot, then translate.
+  const xform=(parts,phi,pivot,to)=>{const c=Math.cos(phi),s=Math.sin(phi);return parts.map(p=>({...p,pts:p.pts.map(q=>{const x=q[0]-pivot[0],y=q[1]-pivot[1];return[x*c-y*s+to[0],x*s+y*c+to[1],q[2]-pivot[2]+to[2]];})}));};
 
-<!-- <nav class="navbar" role="navigation" aria-label="main navigation">
-  <div class="navbar-brand">
-    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-    </a>
-  </div>
-  <div class="navbar-menu">
-    <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
-      <a class="navbar-item" href="https://keunhong.com">
-      <span class="icon">
-          <i class="fas fa-home"></i>
-      </span>
-      </a>
+  // Payloads, built in local coordinates with the base at y=0. Each has a metal plate on top.
+  function can(){return[disc([0,0,0],.5,.24,coral),disc([0,.16,0],.2,.246,gold),disc([0,.5,0],.03,.25,metal),disc([0,.53,0],.006,.12,coral)];}
+  function minidrone(){
+   const P=[slab(.13,.2,.13,.13,dark),slab(.2,.22,.17,.17,metal),disc([0,.22,0],.006,.08,coral)];
+   [[1,1],[-1,-1],[1,-1],[-1,1]].forEach(([sx,sz],j)=>{const m=[sx*.3,.17,sz*.3];P.push(rod([0,.17,0],m,.022,dark),rod([sx*.2,.16,sz*.2],[sx*.25,0,sz*.25],.018,dark),disc(m,.03,.03,dark),disc(add(m,[0,.04,0]),.008,.15,j<2?blue:coral,.75));});
+   return P;
+  }
+  function cube(col){
+   const s=.5,t=.065,c=s/2-t/2,P=[];
+   for(const x of [-c,c])for(const z of [-c,c])P.push(beam([x,0,z],[x,s,z],t,col));
+   for(const y of [t/2,s-t/2])for(const k of [-c,c]){P.push(beam([-s/2,y,k],[s/2,y,k],t,col),beam([k,y,-s/2],[k,y,s/2],t,col));}
+   P.push(slab(s-.035,s+.005,.2,.2,metal));
+   if(col===gold)P.push(disc([0,s+.005,0],.006,.1,coral));
+   return P;
+  }
+  const OBJ=[
+   {name:'Tomato sauce can',say:'“Pick up the tomato sauce can.”',color:'#db7774',top:.536,build:can},
+   {name:'Quadrotor',say:'“Pick up the quadrotor.”',color:'#659cd6',top:.226,build:minidrone},
+   {name:'Yellow cube',say:'“Pick up the yellow cube.”',color:'#e7b74b',top:.511,build:()=>cube(gold)},
+   {name:'Red cube',say:'“Pick up the red cube.”',color:'#c4554f',top:.505,build:()=>cube(brick)}
+  ];
+  const X=[-2.4,-.8,.8,2.4],objParts=OBJ.map(o=>o.build());
 
-      <div class="navbar-item has-dropdown is-hoverable">
-        <a class="navbar-link">
-          More Research
-        </a>
-        <div class="navbar-dropdown">
-          <a class="navbar-item" href="https://hypernerf.github.io">
-            HyperNeRF
-          </a>
-          <a class="navbar-item" href="https://nerfies.github.io">
-            Nerfies
-          </a>
-          <a class="navbar-item" href="https://latentfusion.github.io">
-            LatentFusion
-          </a>
-          <a class="navbar-item" href="https://photoshape.github.io">
-            PhotoShape
-          </a>
+  // Quadrotor in body coordinates; the cable leaves from just under the body.
+  const CABLE=1.0,MAG=.14,HANG=[0,-.12,0],REACH=.12+CABLE+MAG;
+  const drone=(()=>{
+   const P=[slab(-.1,.08,.24,.2,dark),part([0,.08,0],[0,.3,0],.15,.13,cream,true),beam([-.2,-.04,.22],[.2,-.04,.22],.085,silver)];
+   for(const [sx,sz] of [[1,1],[-1,-1],[1,-1],[-1,1]]){
+    const m=[sx*.42,.02,sz*.42];
+    P.push(rod([0,0,0],m,.035,dark),disc(add(m,[0,-.03,0]),.12,.06,silver),disc(add(m,[0,.11,0]),.01,.28,dark,.2),rod(add(m,[0,-.02,0]),[sx*.47,-.42,sz*.47],.042,coral));
+   }
+   P.push(rod([-.3,.36,0],[.3,.36,0],.018,dark),disc([-.3,.3,0],.12,.06,white),disc([.3,.3,0],.12,.06,white),disc([0,.3,.17],.12,.06,white));
+   return P;
+  })();
+
+  // Mission plan: for each payload, fly over it, descend until the magnet meets the plate,
+  // lift and carry it briefly, set it back down, release and climb.
+  const H=2.4,steps=[],segStart=[],segDur=[];let total=0;
+  OBJ.forEach((o,i)=>{
+   const xi=X[i],prev=X[(i+3)%4],Yc=o.top+REACH,Hc=Yc+.7;
+   segStart[i]=total;
+   const plan=[[1.1+.27*Math.abs(xi-prev),[xi,H],'nav'],[.4,[xi,H],'nav'],[.75,[xi,Yc],'down'],[.3,[xi,Yc],'pick'],[.6,[xi,Hc],'lift',1],[.75,[xi+.35,Hc],'carry',1],[.75,[xi,Hc],'carry',1],[.65,[xi,Yc],'drop',1],[.3,[xi,Yc],'drop'],[.6,[xi,H],'up']];
+   let from=steps.length?steps[steps.length-1].to:[prev,H];
+   for(const [dur,to,label,held] of plan){steps.push({t0:total,dur,from,to,label,held:!!held,obj:i});total+=dur;from=to;}
+   segDur[i]=total-segStart[i];
+  });
+  steps[0].from=steps[steps.length-1].to;
+  const BEHAVIOR={nav:'Front VLM Action',down:'Down VLM Action',pick:'Pickup',lift:'Pickup and Operator Confirmation',carry:'Go-To-Relative',drop:'Drop off',up:'Go-To-Relative'};
+  const stepAt=t=>{t=((t%total)+total)%total;let k=steps.length-1;while(k>0&&steps[k].t0>t)k--;return[steps[k],t];};
+  function posAt(t){const [s,tt]=stepAt(t),e=ease(clamp((tt-s.t0)/s.dur,0,1));return[lerp(s.from[0],s.to[0],e),lerp(s.from[1],s.to[1],e)];}
+
+  // Camera: fixed isometric frame fitted to the whole scene, as in the robot-journey hero.
+  const view=p=>[p[0]*.83+p[2]*.64,-p[0]*.25+p[2]*.325-p[1]*.95];
+  let minX=0,maxX=1,minY=0,maxY=1,width=0,height=0;
+  const cameraScale=()=>Math.min(Math.max(1,width-24)/(maxX-minX),Math.max(1,height-24)/(maxY-minY));
+  function project(p){const s=cameraScale(),v=view(p);return[width*.5+s*(v[0]-(minX+maxX)/2),height*.5+s*(v[1]-(minY+maxY)/2)];}
+  const faces=[];for(let j=0;j<12;j++)faces.push([j,(j+1)%12,(j+1)%12+12,j+12]);faces.push(Array.from({length:12},(_,i)=>11-i),Array.from({length:12},(_,i)=>i+12));
+  const light=unit([-3,6,4]),camera=unit([-.608,.429,.788]);
+
+  // Cable-suspended magnet as a damped pendulum driven by the quadrotor's acceleration.
+  const G=14;let theta=0,omega=0;
+  const accelAt=t=>{const h=1/120;return(posAt(t+h)[0]-2*posAt(t)[0]+posAt(t-h)[0])/(h*h);};
+  function integrate(dt,t){
+   const [s]=stepAt(t),L=CABLE+MAG+(s.held?OBJ[s.obj].top*.6:0),n=Math.ceil(dt/(1/240)),h=dt/n;
+   for(let k=0;k<n;k++){const ax=accelAt(t+k*h);omega+=(-(G/L)*Math.sin(theta)-(ax/L)*Math.cos(theta)-1.6*omega)*h;theta+=omega*h;}
+   // Alignment near contact: the downward approach centres the magnet before it touches the plate.
+   const lock=s.label==='pick'?22:s.label==='down'||s.label==='drop'?6:0;
+   if(lock){const f=Math.exp(-dt*lock);theta*=f;omega*=f;}
+  }
+
+  let clock=0,last=0,playing=!reduce.matches,visible=true,active=-1,blend=null;
+  function scene(){
+   const [s]=stepAt(clock);let [dx,dy]=posAt(clock);
+   if(blend){const k=1-ease(clamp(blend.elapsed/blend.dur,0,1));dx+=blend.off[0]*k;dy+=blend.off[1]*k;}
+   const tilt=playing||blend?clamp(-accelAt(clock)*.045,-.3,.3):0;
+   const P=xform(drone,tilt,[0,0,0],[dx,dy,0]);
+   const c=Math.cos(tilt),sn=Math.sin(tilt),top=[dx+HANG[0]*c-HANG[1]*sn,dy+HANG[0]*sn+HANG[1]*c,0];
+   const dir=[Math.sin(theta),-Math.cos(theta),0],magTop=add(top,mul(dir,CABLE)),magBot=add(magTop,mul(dir,MAG));
+   // Cable: a short curve that bows against the swing, drawn as thin segments so it depth-sorts with the parts.
+   const bend=clamp(-omega*.05,-.12,.12),mid=add(add(top,mul(dir,CABLE/2)),[Math.cos(theta)*bend,Math.sin(theta)*bend,0]);
+   let a=top;for(let k=1;k<=6;k++){const t=k/6,b=add(add(mul(top,(1-t)*(1-t)),mul(mid,2*t*(1-t))),mul(magTop,t*t));P.push(rod(a,b,.022,dark));a=b;}
+   P.push(rod(magTop,add(magTop,mul(dir,MAG*.7)),.055,dark),rod(add(magTop,mul(dir,MAG*.7)),magBot,.06,silver));
+   const shadows=[[dx,.62,.11*clamp(1.4-dy/3,.2,1)]];
+   OBJ.forEach((o,i)=>{
+    if(s.held&&s.obj===i){P.push(...xform(objParts[i],theta,[0,o.top,0],magBot));shadows.push([magBot[0],.3,.09*clamp(1.2-magBot[1]/2,.2,1)]);}
+    else{P.push(...xform(objParts[i],0,[0,0,0],[X[i],0,0]));shadows.push([X[i],.32,.12]);}
+   });
+   return{P,shadows,step:s};
+  }
+  // Fit the camera to every pose the mission passes through, so the scene fills the canvas without clipping.
+  (()=>{let a=1/0,b=-1/0,c=1/0,d=-1/0;for(let t=0;t<total;t+=.1){clock=t;for(const p of scene().P)for(const q of p.pts){const v=view(q);a=Math.min(a,v[0]);b=Math.max(b,v[0]);c=Math.min(c,v[1]);d=Math.max(d,v[1]);}}clock=0;
+   minX=a-.15;maxX=b+.15;minY=c-.1;maxY=d+.25;})();
+  function draw(){
+   g.clearRect(0,0,width,height);
+   const {P,shadows,step}=scene(),s=cameraScale();
+   for(const [x,r,a] of shadows){const c=project([x,0,0]);g.save();g.translate(c[0],c[1]);g.scale(1,.32);const sh=g.createRadialGradient(0,0,0,0,0,s*r);sh.addColorStop(0,`rgba(49,52,42,${a})`);sh.addColorStop(.6,`rgba(49,52,42,${a*.45})`);sh.addColorStop(1,'rgba(49,52,42,0)');g.fillStyle=sh;g.beginPath();g.arc(0,0,s*r,0,TAU);g.fill();g.restore();}
+   const all=[];
+   for(const p of P){
+    for(const f of faces){const ps=f.map(j=>p.pts[j]);const nrm=unit(cross(sub(ps[1],ps[0]),sub(ps[2],ps[0])));const shade=.8+.23*dot(nrm,light);const depth=ps.reduce((v,q)=>v+dot(q,camera),0)/ps.length;all.push({ps,col:p.color.map(c=>clamp(c*shade,0,255)),depth,op:p.opacity});}
+   }
+   all.sort((a,b)=>a.depth-b.depth);
+   for(const f of all){const pts=f.ps.map(project);g.beginPath();g.moveTo(...pts[0]);for(let k=1;k<pts.length;k++)g.lineTo(...pts[k]);g.closePath();g.fillStyle=`rgba(${f.col.map(Math.round).join(',')},${f.op})`;g.fill();if(f.op>.9){g.strokeStyle=g.fillStyle;g.lineWidth=.45;g.stroke();}}
+   updateLabel(step);
+  }
+  function updateLabel(step){
+   const k=step.obj,key=k+step.label;if(active===key)return;
+   if(active===-1||+String(active)[0]!==k){
+    const o=OBJ[k];root.style.setProperty('--stage',o.color);
+    root.querySelector('.p2f-index').textContent=`0${k+1} / ${o.name}`;root.querySelector('h2').textContent=o.say;
+    buttons.forEach((b,i)=>b.setAttribute('aria-pressed',String(i===k)));
+   }
+   root.querySelector('.p2f-behavior b').textContent=BEHAVIOR[step.label];active=key;
+  }
+  function progress(){buttons.forEach((b,i)=>{const t=((clock%total)+total)%total;b.querySelector('i').style.width=`${clamp((t-segStart[i])/segDur[i],0,1)*100}%`;});}
+  function resize(){const r=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);width=r.width;height=r.height;canvas.width=width*dpr;canvas.height=height*dpr;g.setTransform(dpr,0,0,dpr,0,0);draw();}
+  new ResizeObserver(resize).observe(canvas);
+  function setPlay(){play.innerHTML=playing?'Pause <span aria-hidden="true">Ⅱ</span>':'Play <span aria-hidden="true">▶</span>';play.setAttribute('aria-label',playing?'Pause animation':'Play animation');}
+  play.addEventListener('click',()=>{playing=!playing;last=0;setPlay();});
+  // Jumping to a payload flies the quadrotor there from wherever it is, rather than teleporting.
+  buttons.forEach((b,i)=>b.addEventListener('click',()=>{
+   const before=posAt(clock),off=blend?(()=>{const k=1-ease(clamp(blend.elapsed/blend.dur,0,1));return[blend.off[0]*k,blend.off[1]*k];})():[0,0];
+   clock=segStart[i]+steps.find(s=>s.obj===i).dur;const after=posAt(clock);
+   blend=reduce.matches?null:{off:[before[0]+off[0]-after[0],before[1]+off[1]-after[1]],elapsed:0,dur:1.1};
+   if(!blend){theta=omega=0;}
+   draw();progress();
+  }));
+  function frame(now){
+   const dt=last?Math.min((now-last)/1000,.05):0;last=now;
+   if(visible){
+    if(blend){blend.elapsed+=dt;if(blend.elapsed>=blend.dur)blend=null;}
+    if(playing&&dt>0){integrate(dt,clock);clock=(clock+dt)%total;}
+    else if(blend&&dt>0)integrate(dt,clock);
+    draw();progress();
+   }
+   requestAnimationFrame(frame);
+  }
+  document.addEventListener('visibilitychange',()=>{visible=!document.hidden;last=0;});
+  if('IntersectionObserver' in window)new IntersectionObserver(e=>{visible=e[0].isIntersecting&&!document.hidden;last=0;},{threshold:0}).observe(root);
+  reduce.addEventListener('change',e=>{if(e.matches){playing=false;blend=null;theta=omega=0;setPlay();draw();}});
+  // With reduced motion, rest on a still frame of the quadrotor carrying the can.
+  if(!playing)clock=steps.find(s=>s.label==='carry').t0;
+  // Deterministic hook for screenshots: seek to a time in seconds.
+  root.p2f={seek:t=>{playing=false;blend=null;theta=omega=0;clock=t;setPlay();draw();progress();},
+   advance:sec=>{for(let k=0;k<sec*60;k++){integrate(1/60,clock);clock=(clock+1/60)%total;}draw();progress();},total};
+  setPlay();resize();progress();requestAnimationFrame(frame);
+  })();
+  </script>
+
+  <section class="ed-section" id="abstract">
+    <div class="ed-section-head ed-label">01 / Abstract</div>
+    <div class="ed-prose">
+      <p>
+        Aerial robots are versatile platforms for efficient package transportation in safety-critical scenarios, but reliable long-horizon mission execution requires effective collaboration with human supervisors.
+        Enabling shared autonomy for these aerial systems requires natural-language communication, interpretable task decomposition, and explicit mechanisms for human oversight of safety-critical decisions.
+        To address these challenges, we present Prompt2Fly, a hierarchical framework that combines large language models (LLMs) and vision-language models (VLMs) to translate natural-language commands into executable aerial payload-transportation missions using egocentric robot observations.
+        Prompt2Fly employs an LLM to generate reactive behavior trees grounded in validated aerial transportation behaviors, while extracting task-relevant context to condition VLM-based navigation skills.
+        This architecture combines the semantic reasoning and generalization capabilities of pretrained models with the interpretability and modularity of established planning and control algorithms.
+        We demonstrate Prompt2Fly on cable-suspended payload transportation, where the system's underactuated and coupled payload dynamics introduce multiple challenges.
+        We validate the framework through extensive real-world experiments using onboard cameras and a magnetic pickup mechanism.
+        The system identifies and transports payloads in various environments and under different task specifications.
+        To the best of our knowledge, Prompt2Fly is the first system to demonstrate vision-language-based autonomous payload transportation using slung-load aerial robots.
+      </p>
+    </div>
+  </section>
+
+  <section class="ed-section" id="overview">
+    <figure>
+      <img src="./static/images/fig1_overview.png" alt="Overview of Prompt2Fly: natural-language input, grounding in robot skills, LLM behavior tree generation, and shared autonomy, with real-world transport of a quadrotor, a yellow cube, and a tomato sauce can." loading="eager">
+      <figcaption>
+        <span class="ed-label">Fig. 1</span>
+        <strong>(A) Overview of Prompt2Fly.</strong>
+        The user provides a natural-language (NL) instruction to the aerial robot. An LLM, grounded in a predefined set of robot capabilities such as visual navigation and position control, parses the instruction and generates an executable Behavior Tree (BT). The BT is then deployed on the robot with a human in the loop, allowing the operator to supervise safety-critical transitions, including payload-pickup/dropoff confirmation and emergency-stop execution.
+        <strong>(B–D) Real-world zero-shot payload transportation with Prompt2Fly:</strong>
+        We demonstrate generalization across objects with substantially different geometry, appearance, and dynamics by transporting <strong>(B)</strong> another quadrotor, <strong>(C)</strong> a yellow cube, and <strong>(D)</strong> a tomato sauce can.
+      </figcaption>
+    </figure>
+  </section>
+
+  <section class="ed-section" id="contributions">
+    <div class="ed-section-head ed-label">02 / Contributions</div>
+    <ol class="ed-contributions">
+      <li>
+        <span class="ed-label">01</span>
+        <div>
+          <h3>Language-Guided Behavior Tree Generation for Robot Autonomy</h3>
+          <p>A language-to-behavior-tree framework that uses pretrained LLMs without task-specific fine-tuning to compose aerial transportation behaviors into executable BTs and generate behavior-specific VLM context, supporting real-world deployment.</p>
         </div>
-      </div>
-    </div>
-
-  </div>
-</nav> -->
-
-
-<section class="hero">
-  <div class="hero-body">
-    <div class="container is-max-desktop">
-      <div class="columns is-centered">
-        <div class="column has-text-centered">
-          <h1 class="title is-1 publication-title">PolyFly: Polytopic Optimal Planning for Collision-Free Cable-Suspended Aerial Payload Transportation</h1>
-          <div class="is-size-5 publication-authors">
-            <span class="author-block" style="font-size: 1.1em;">
-              <a href="https://mrunaljsarvaiya.github.io/">Mrunal Sarvaiya</a>,</span>
-            <span class="author-block"  style="font-size: 1.1em;">
-              <a href="https://lguanrui.github.io/">Guanrui Li</a>,
-            <span class="author-block" style="font-size: 1.0em;">
-              <a href="https://wp.nyu.edu/arpl/">Giuseppe Loianno</a>,
-            </span>
-          </div>
-
-          <div class="is-size-5 publication-authors" style="font-size: 1.2em;">
-            <span class="author-block">
-              <a href="https://wp.nyu.edu/arpl/">Agile Robotics And Perception Lab, New York University</a>
-            </span>
-          </div>
-
-
-	  <div class="column has-text-centered">
-	    <span class="conference-block" style="font-size: 1.4em;">
-	      Accepted to IEEE Robotics Automation and Letters
-	    </span> 
-	  </div>
-
-          <div class="column has-text-centered">
-            <div class="publication-links">
-              <!-- PDF Link. -->
-              <span class="link-block">
-                <a href="https://arxiv.org/abs/2510.15226"
-                   class="external-link button is-normal is-rounded is-dark">
-                    <span class="icon">
-                        <i class="ai ai-arxiv"></i>
-                    </span>
-                    <span>arXiv</span>
-                  </a>
-                </a>
-              </span>
-              <span class="link-block">
-                <a href="https://arxiv.org/abs/2510.15226"
-                   class="external-link button is-normal is-rounded is-dark">
-                    <span class="icon">
-                        <i class="ai ai-ieee"></i>
-                    </span>
-                    <span>IEEE</span>
-                  </a>
-                </a>
-              </span>
-              <!-- Video Link. -->
-              <span class="link-block">
-                <a href="https://www.youtube.com/watch?v=a6Wj28tFZEU"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fab fa-youtube"></i>
-                  </span>
-                  <span>Video</span>
-                </a>
-              </span>
-              <!-- GitHub Link. -->
-              <span class="link-block">
-                <a href="https://github.com/arplaboratory/polyfly"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fab fa-github"></i>
-                  </span>
-                  <span>Code</span>
-                </a>
-              </span>
-          </div>
+      </li>
+      <li>
+        <span class="ed-label">02</span>
+        <div>
+          <h3>VLM-Based Suspended-Payload Transportation Planner</h3>
+          <p>A vision-language-conditioned planner tailored to aerial transportation systems that leverages VLMs to generate robot commands for the autonomous transportation of random objects from onboard camera observations.</p>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="section gray-background">
-  <div class="container is-max-desktop">
-    <!-- Abstract. -->
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-four-fifths">
-        <h2 class="title is-3">Abstract</h2>
-        <div class="content has-text-justified">
-          <p>
-            Aerial transportation robots using suspended cables have emerged as versatile platforms for disaster response and rescue operations. 
-            To maximize the capabilities of these systems, robots need to aggressively fly through tightly constrained environments, such as dense forests and structurally unsafe buildings, while minimizing flight time and avoiding obstacles. 
-            Existing methods geometrically over-approximate the vehicle and obstacles, leading to conservative maneuvers and increased flight times. 
-          </p>
-          <p>
-            We eliminate these restrictions by proposing PolyFly, an optimal global planner which considers a non-conservative representation for aerial transportation by modeling each physical component of the environment, and the robot (quadrotor, cable and payload), as independent polytopes. 
-            We further increase the model accuracy by incorporating the attitude of the physical components by constructing orientation-aware polytopes. 
-            The resulting optimal control problem is efficiently solved by converting the polytope constraints into smooth differentiable constraints via duality theory. 
-            We compare our method against the existing state-of-the-art approach in eight maze-like environments and show that PolyFly produces faster trajectories in each scenario. 
-            We also experimentally validate our proposed approach on a real quadrotor with a suspended payload, demonstrating the practical reliability and accuracy of our method.
-
-          </p>
+      </li>
+      <li>
+        <span class="ed-label">03</span>
+        <div>
+          <h3>Shared Autonomy Through Human-In-The-Loop Supervision</h3>
+          <p>A collaborative human-in-the-loop architecture built on reactive BTs, allowing an operator to respond to safety-critical behavior transitions.</p>
         </div>
-      </div>
-    </div>
-    <!--/ Abstract. -->
-  </div>
-</section>
-
-<section class="hero is-light is-small">
-  <div class="hero-body">
-    <div class="container">
-      <div class="columns is-centered has-text-centered">
-        <div class="column is-four-fifths">
-          <h2 class="title is-3">System Overview and Real World Experiments</h2>
-          <p class="has-text-centered mb-4">
-	  <p class="has-text-centered mb-4">
-	  <p class="has-text-centered mb-4">
-	  	  <p class="has-text-centered mb-4">
-          <!-- TEXT if needed -->
-	  	            </p>
-	            </p>
-	            </p>
-          </p>
-          <div id="results-videos" class="video-container">
-            <div class="video-item">
-              <iframe id="teaser1" width="560" height="315" 
-                src="https://www.youtube.com/embed/a6Wj28tFZEU?si=s6Q9i8v4l_CUeqpN" 
-                title="YouTube video player" frameborder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-              allowfullscreen></iframe>
-              <h2 class="subtitle has-text-centered" >
-                <!-- TEXT for video -->
-              </h2>
-            </div>
-            </div>
-          </div>
+      </li>
+      <li>
+        <span class="ed-label">04</span>
+        <div>
+          <h3>Real-World Validation</h3>
+          <p>Extensive real-world experiments, demonstrating end-to-end execution of diverse payload-transportation missions using multiple onboard cameras and a magnetic pickup mechanism. To the best of our knowledge, Prompt2Fly is the first system to demonstrate vision-language-based autonomous transportation tasks with cable-suspended payloads.</p>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- <section class="hero teaser"> -->
-<!--   <div class="container is-max-desktop"> -->
-<!--     <div class="hero-body"> -->
-<!--       <video id="teaser" autoplay controls muted loop playsinline height="100%"> -->
-<!--         <source src="./static/videos/icra_hongze_compressed.mp4" -->
-<!--                 type="video/mp4"> -->
-<!--       </video> -->
-<!--     </div> -->
-<!--   </div> -->
-<!-- </section> -->
+      </li>
+    </ol>
+  </section>
 
+  <section class="ed-section" id="system">
+    <div class="ed-section-head ed-label">03 / System</div>
+    <figure>
+      <img src="./static/images/fig2_robot.png" alt="Quadrotor with cameras, cable, and magnet, next to the four payloads: a tomato sauce can, a quadrotor, a yellow cube, and a red cube." loading="lazy">
+      <figcaption>
+        <span class="ed-label">Fig. 2</span>
+        <strong>Left:</strong> Quadrotor with a suspended payload and the magnetic pickup mechanism.
+        <strong>Right:</strong> The four different payloads transported with our method. Each uses a flat metal plate for magnetic attachment, with varying appearances and optional bullseye markings to aid pickup localization.
+      </figcaption>
+    </figure>
+  </section>
 
+  <section class="ed-section" id="perception">
+    <div class="ed-section-head ed-label">04 / Semantic Perception</div>
+    <figure>
+      <img src="./static/images/fig3_perception.png" alt="Two-stage perception pipeline: Grounding DINO initialization at 1 Hz, then CLIPSeg tracking on zoom-cropped frames at 10 Hz." loading="lazy">
+      <figcaption>
+        <span class="ed-label">Fig. 3</span>
+        <strong>Overview of the onboard two-stage semantic perception pipeline.</strong>
+        Grounding DINO provides an accurate full-image initialization from the language query, after which CLIPSeg performs high-frequency tracking. The updated detection is recursively used to define the crop for the next frame, reducing the visual search space while maintaining robust target detection.
+      </figcaption>
+    </figure>
+  </section>
 
-<!-- <section class="section">
-  <div class="container is-max-desktop">
-    <div class="columns is-centered has-text-centered">
-      <div class="column">
-        <h2 class="title is-3">Method</h2>
-        <img src="./static/images/overview.png" alt="Method" style="max-width: 100%; height: auto;">
-        <h2 class="subtitle has-text-centered" style="font-size: 16px;">
-	text
-        </h2>
-    </div>
-  </div>
-</section> -->
-<!-- 
-<section class="section">
-  <div class="container is-max-desktop">
-    <div class="columns is-centered has-text-centered">
-      <div class="column">
-        <h2 class="title is-3">Race tracks Visualization</h2>
-        <img src="./static/images/tracks.png" alt="Method" style="max-width: 100%; height: auto;">
-        <h2 class="subtitle has-text-centered" style="font-size: 16px;">
-          text
-        </h2>
-    </div>
-  </div>
-</section> -->
+  <section class="ed-section" id="experiments">
+    <div class="ed-section-head ed-label">05 / Real-World Experiments</div>
+    <figure>
+      <img src="./static/images/fig4_ladder.png" alt="Operator prompt and eight sequential snapshots of the quadrotor locating the ladder, approaching and picking up the red cube, transporting it, and landing." loading="lazy">
+      <figcaption>
+        <span class="ed-label">Fig. 4</span>
+        <strong>A long-range payload transportation mission demonstrating the zero-shot deployment of Prompt2Fly.</strong>
+        The operator prompt, shown on the left, instructs the robot to locate the red box next to the ladder and transport it to the specified destination. Sequential snapshots of the experiment are shown on the right.
+      </figcaption>
+    </figure>
+    <figure>
+      <img src="./static/images/fig5_bt.png" alt="LLM-generated behavior tree with a safety branch (emergency, pause) and a nominal mission (take off, pick up, transport to goal, land) with confirmation and contingency nodes." loading="lazy">
+      <figcaption>
+        <span class="ed-label">Fig. 5</span>
+        <strong>LLM-generated BT for a payload transportation mission.</strong>
+        The nominal mission executes takeoff, visual payload pickup, transport, drop-off, and landing, with operator confirmation and contingency behaviors at mission-critical transitions. Reactive and resumable control nodes allow execution to transition between nominal, safety, and operator-intervention behaviors. The safety branch is triggered when any subtree in the nominal mission returns a failure.
+      </figcaption>
+    </figure>
+  </section>
 
+  <footer class="ed-footer ed-label">
+    Website template adapted from <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>
+  </footer>
 
-<!--     <div class="container"> -->
-<!--       <div class="columns is-centered has-text-centered"> -->
-<!--         <div class="column is-four-fifths"> -->
-<!--           <h2 class="title is-3">Real World Results</h2> -->
-<!--       <div id="results-carousel" class="carousel results-carousel"> -->
-<!--         <div class="item item-steve"> -->
-<!--           <video poster="" id="steve" autoplay controls muted loop playsinline height="100%"> -->
-<!--             <source src="./static/videos/Figure 8.m4v" -->
-<!--                     type="video/mp4"> -->
-<!--           </video> -->
-          
-<!--         </div> -->
-<!--         <div class="item item-chair-tp"> -->
-<!--           <video poster="" id="chair-tp" autoplay controls muted loop playsinline height="100%"> -->
-<!--             <source src="./static/videos/Figure8_3D.m4v" -->
-<!--                     type="video/mp4"> -->
-<!--           </video> -->
-<!--         </div> -->
-<!--         <div class="item item-shiba"> -->
-<!--           <video poster="" id="shiba" autoplay controls muted loop playsinline height="100%"> -->
-<!--             <source src="./static/videos/Kidney.m4v" -->
-<!--                     type="video/mp4"> -->
-<!--           </video> -->
-<!--         </div> -->
-<!--         <div class="item item-fullbody"> -->
-<!--           <video poster="" id="fullbody" autoplay controls muted loop playsinline height="100%"> -->
-<!--             <source src="./static/videos/SS.m4v" -->
-<!--                     type="video/mp4"> -->
-<!--           </video> -->
-<!--         </div> -->
-<!--         <div class="item item-blueshirt"> -->
-<!--           <video poster="" id="blueshirt" autoplay controls muted loop playsinline height="100%"> -->
-<!--             <source src="./static/videos/SS_3D.m4v" -->
-<!--                     type="video/mp4"> -->
-<!--           </video> -->
-<!--         </div> -->
-<!--         <div class="item item-mask"> -->
-<!--           <video poster="" id="mask" autoplay controls muted loop playsinline height="100%"> -->
-<!--             <source src="./static/videos/Twist.m4v" -->
-<!--                     type="video/mp4"> -->
-<!--           </video> -->
-<!--         </div> -->
-<!--       </div> -->
-<!--     </div> -->
-<!--   </div> -->
-<!-- </section> --> 
-
-
-<!--<section class="section"> -->
-<!--  <div class="container is-max-desktop"> -->
-<!--    <!-1- Animation. -1-> -->
-<!--    <div class="columns is-centered has-text-centered"> -->
-<!--      <div class="column is-full-width"> -->
-<!--        <h2 class="title is-3">Simulation</h2> -->
-
-<!--        <div class="content has-text-justified"> -->
-<!--          <p> -->
-<!--            We can also animate the dynamic track racing experiment. --> 
-<!--            Use the slider here to control a group of drones flying through a dynamic Figure 8 track. -->
-<!--          </p> -->
-<!--        </div> -->
-<!--        <div class="columns is-vcentered interpolation-panel"> -->
-<!--          <div class="column is-3 has-text-centered"> -->
-<!--          </div> -->
-<!--          <div class="column interpolation-video-column"> -->
-<!--            <div id="interpolation-image-wrapper"> -->
-<!--              Loading... -->
-<!--            </div> -->
-<!--            <input class="slider is-fullwidth is-large is-info" -->
-<!--                   id="interpolation-slider" -->
-<!--                   step="1" min="0" max="100" value="0" type="range"> -->
-<!--          </div> -->
-<!--          <div class="column is-3 has-text-centered"> -->
-<!--          </div> -->
-<!--        </div> -->
-<!--        <br/> -->
-<!--        <!-1-/ Interpolating. -1-> -->
-<!--      </div> -->
-<!--    </div> -->
-<!--    <!-1-/ Animation. -1-> -->
-<!--  </div> -->
-<!--</section> -->
-
-
-<!-- <section class="section" id="BibTeX">
-  <div class="container is-max-desktop content">
-    <h2 class="title">BibTeX</h2>
-    <pre><code>@article{xing2024bootstrapping,
-  title = {Bootstrapping Reinforcement Learning with Imitation for Vision-Based Agile Flight},
-  author = {Xing, Jiaxu and Romero, Angel and Bauersfeld, Leonard and Scaramuzza, Davide},
-  journal = {8th Conference on Robot Learning (CoRL)},
-  year = {2024},
-}
-</code></pre>
-  </div>
-</section>  -->
-
-<footer class="footer">
-  <div class="container">
-    <div class="columns is-centered">
-      <div class="column is-8">
-        <div class="content">
-          <p>
-            This website borrowed from the <a
-              href="https://github.com/nerfies/nerfies.github.io"><span class="dnerf">Nerfies</span></a>.
-        </div>
-      </div>
-    </div>
-  </div>
-</footer>
+</main>
 
 </body>
 </html>
